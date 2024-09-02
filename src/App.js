@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { Plus, Minus, DollarSign } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card"
 import { Button } from "./components/ui/button.jsx"
 import { Input } from "./components/ui/input.jsx"
