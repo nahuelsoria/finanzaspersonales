@@ -24,7 +24,7 @@ Esta aplicación web de gestión de finanzas personales permite a los usuarios l
 ## Instalación y configuración
 1. Clona el repositorio:
    ```
-   git clone [URL_DEL_REPOSITORIO]
+   git clone https://github.com/nahuelsoria/finanzaspersonales.git
    ```
 2. Instala las dependencias:
    ```
