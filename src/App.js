@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, DollarSign } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button.jsx";
 import { Input } from "./components/ui/input.jsx";
@@ -18,6 +18,10 @@ import {
 } from "firebase/firestore";
 import Auth from "./components/Auth";
 import { motion } from "framer-motion";
+import { ThemeContext } from "./ThemeContext.js";
+import ThemeToggle from "./components/ui/ThemeToggle.jsx";
+import { ThemeProvider } from "./ThemeContext.js";
+
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
@@ -28,6 +32,8 @@ const FinanzasApp = () => {
   const [balance, setBalance] = useState(0);
   const [user, setUser] = useState(null);
   const [editingTransaction, setEditingTransaction] = useState(null);
+
+  const { isDarkMode } = useContext(ThemeContext);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -145,19 +151,19 @@ const FinanzasApp = () => {
 
   return (
     <motion.div
-      className="max-w-4xl mx-auto p-4"
+      className={`max-w-4xl mx-auto p-4 ${isDarkMode ? 'dark' : ''}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <h1 className="text-3xl font-bold mb-6 text-center">
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-gray-800">
         Gestión de Finanzas Personales
       </h1>
-
+      <ThemeToggle />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white dark:bg-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
+            <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white">
               {editingTransaction ? "Editar Transacción" : "Nueva Transacción"}
             </CardTitle>
           </CardHeader>
@@ -165,7 +171,7 @@ const FinanzasApp = () => {
             <div className="space-y-4">
               <Label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Descripción
               </Label>
@@ -174,11 +180,11 @@ const FinanzasApp = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ej: Comida, Salario, etc."
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white"
               />
               <Label
                 htmlFor="amount"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Monto
               </Label>
@@ -188,8 +194,9 @@ const FinanzasApp = () => {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white"
               />
+
               <div className="flex space-x-2">
                 <Button
                   onClick={
@@ -197,7 +204,7 @@ const FinanzasApp = () => {
                       ? updateTransaction
                       : () => addTransaction("ingreso")
                   }
-                  className="flex-1 bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600"
+                  className="flex-1 bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
                 >
                   <Plus className="mr-2 h-4 w-4" />{" "}
                   {editingTransaction ? "Actualizar" : "Ingreso"}
@@ -209,7 +216,7 @@ const FinanzasApp = () => {
                       : () => addTransaction("gasto")
                   }
                   variant="destructive"
-                  className="flex-1 bg-red-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-red-600"
+                  className="flex-1 bg-red-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
                 >
                   <Minus className="mr-2 h-4 w-4" />{" "}
                   {editingTransaction ? "Actualizar" : "Gasto"}
@@ -221,9 +228,9 @@ const FinanzasApp = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white dark:bg-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
+            <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white">
               Últimas Transacciones
             </CardTitle>
           </CardHeader>
@@ -235,12 +242,12 @@ const FinanzasApp = () => {
                 .map((transaction) => (
                   <motion.li
                     key={transaction.id}
-                    className="flex justify-between items-center p-2 bg-white rounded-md shadow-sm"
+                    className="flex justify-between items-center p-2 bg-white dark:bg-gray-700 rounded-md shadow-sm"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <span>{transaction.description}</span>
+                    <span className="text-gray-800 dark:text-white">{transaction.description}</span>
                     <span
                       className={
                         transaction.amount > 0
@@ -253,14 +260,14 @@ const FinanzasApp = () => {
                     <div className="flex space-x-2">
                       <Button
                         onClick={() => setEditingTransaction(transaction)}
-                        className="bg-blue-500 text-white py-1 px-2 rounded-md shadow-md hover:bg-blue-600"
+                        className="bg-blue-500 text-white py-1 px-2 rounded-md shadow-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
                       >
                         Editar
                       </Button>
                       <Button
                         onClick={() => deleteTransaction(transaction.id)}
                         variant="destructive"
-                        className="bg-red-500 text-white py-1 px-2 rounded-md shadow-md hover:bg-red-600"
+                        className="bg-red-500 text-white py-1 px-2 rounded-md shadow-md hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
                       >
                         Eliminar
                       </Button>
@@ -271,9 +278,9 @@ const FinanzasApp = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white dark:bg-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
+            <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white">
               Distribución de Gastos
             </CardTitle>
           </CardHeader>
@@ -300,9 +307,9 @@ const FinanzasApp = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white dark:bg-gray-800">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
+            <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white">
               Distribución de Ingresos
             </CardTitle>
           </CardHeader>
@@ -329,6 +336,7 @@ const FinanzasApp = () => {
           </CardContent>
         </Card>
       </div>
+      <ThemeToggle />
     </motion.div>
   );
 };

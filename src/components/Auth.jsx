@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
-import { auth } from '../firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { motion } from 'framer-motion';
+import React, { useState, useContext } from "react";
+import { auth } from "../firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-
+import { ThemeContext } from "../ThemeContext.js";
 const Auth = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
+
+  const { isDarkMode } = useContext(ThemeContext);
 
   const handleAuth = async () => {
     try {
@@ -25,22 +30,25 @@ const Auth = () => {
   };
 
   return (
-    <motion.div 
-      className="flex items-center justify-center min-h-screen bg-gray-100"
-      initial={{ opacity: 0 }}
+    <motion.div
+    className={`flex items-center justify-center min-h-screen ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}
+    initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            {isRegistering ? 'Registrar' : 'Iniciar Sesión'}
+      <Card className={`w-full max-w-md shadow-lg ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
+      <CardHeader>
+      <CardTitle className={`text-2xl font-bold text-center ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+      {isRegistering ? "Registrar" : "Iniciar Sesión"}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email
               </Label>
               <Input
@@ -53,7 +61,10 @@ const Auth = () => {
               />
             </div>
             <div>
-              <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contraseña
               </Label>
               <Input
@@ -65,17 +76,19 @@ const Auth = () => {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
             </div>
-            <Button 
+            <Button
               onClick={handleAuth}
               className="w-full bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition duration-300"
             >
-              {isRegistering ? 'Registrar' : 'Iniciar Sesión'}
+              {isRegistering ? "Registrar" : "Iniciar Sesión"}
             </Button>
-            <Button 
+            <Button
               onClick={() => setIsRegistering(!isRegistering)}
               className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-md shadow-md hover:bg-gray-300 transition duration-300"
             >
-              {isRegistering ? '¿Ya tienes cuenta? Inicia Sesión' : '¿No tienes cuenta? Regístrate'}
+              {isRegistering
+                ? "¿Ya tienes cuenta? Inicia Sesión"
+                : "¿No tienes cuenta? Regístrate"}
             </Button>
           </div>
         </CardContent>
