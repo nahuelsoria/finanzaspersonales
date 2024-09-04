@@ -107,14 +107,17 @@ const FinanzasApp = () => {
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const [transactionsPerPage] = useState(10);
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 
   const { isDarkMode } = useContext(ThemeContext);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const indexOfLastTransaction = currentPage * transactionsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
-  const currentTransactions = transactions.slice(
+  const sortedTransactions = transactions.sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
+  const currentTransactions = sortedTransactions.slice(
     indexOfFirstTransaction,
     indexOfLastTransaction
   );
@@ -155,32 +158,33 @@ const FinanzasApp = () => {
     setDescription(transaction.description);
     setAmount(Math.abs(transaction.amount).toString());
     setCategory(transaction.category);
+    setDate(new Date(transaction.date).toISOString().split("T")[0]);
   };
 
   const addOrUpdateTransaction = async (type) => {
-    if (description && amount && category && user) {
+    if (description && amount && category && user && date) {
       const transactionData = {
         description,
         amount: type === "ingreso" ? parseFloat(amount) : -parseFloat(amount),
         category,
         type,
         userId: user.uid,
+        date: new Date(date).toISOString(),
         createdAt: new Date(),
       };
 
       try {
         if (editingTransaction) {
-          // Actualizar transacción existente
           const transactionRef = doc(db, "transactions", editingTransaction.id);
           await updateDoc(transactionRef, transactionData);
           setEditingTransaction(null);
         } else {
-          // Agregar nueva transacción
           await addDoc(collection(db, "transactions"), transactionData);
         }
         setDescription("");
         setAmount("");
         setCategory(CATEGORIES[0]);
+        setDate(new Date().toISOString().split("T")[0]);
       } catch (error) {
         console.error("Error al agregar/actualizar la transacción:", error);
       }
@@ -273,7 +277,9 @@ const FinanzasApp = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Gestión de Finanzas Personales</h1>
+            <h1 className="text-3xl font-bold">
+              Gestión de Finanzas Personales
+            </h1>
 
             <ThemeToggle />
           </div>
@@ -324,6 +330,19 @@ const FinanzasApp = () => {
                     className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                   <Label
+                    htmlFor="date"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Fecha
+                  </Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                  <Label
                     htmlFor="category"
                     className="text-gray-700 dark:text-gray-300"
                   >
@@ -366,13 +385,13 @@ const FinanzasApp = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="shadow-lg bg-white dark:bg-gray-800 transition-all duration-300 hover:shadow-xl">
-            <CardHeader>
-  <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
-    <DollarSign className="mr-2 h-6 w-6 text-blue-500" aria-hidden="true" />
-    <h3 className="text-xl font-semibold">Últimas Transacciones</h3>
-  </CardTitle>
-</CardHeader>
+            <Card className="shadow-lg bg-white dark:bg-gray-800">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
+                  <DollarSign className="mr-2 h-6 w-6 text-blue-500" />
+                  Últimas Transacciones
+                </CardTitle>
+              </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
                   {currentTransactions.map((transaction) => {
@@ -381,18 +400,21 @@ const FinanzasApp = () => {
                     return (
                       <motion.li
                         key={transaction.id}
-                        className="flex flex-col p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm mb-2"
+                        className="flex justify-between items-center p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm mb-2"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <div className="flex items-center mb-2">
-                          <CategoryIcon className="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                        <div className="flex items-center space-x-3">
+                          <CategoryIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                           <span className="text-gray-800 dark:text-white font-medium">
                             {transaction.description}
                           </span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {new Date(transaction.date).toLocaleDateString()}
+                          </span>
                         </div>
-                        <div className="flex justify-between items-center w-full">
+                        <div className="flex items-center space-x-3">
                           <span
                             className={`${
                               transaction.amount > 0
