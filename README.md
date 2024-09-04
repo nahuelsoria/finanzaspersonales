@@ -66,7 +66,7 @@ E-mail:jorgenahuelsoria@gmail.com
 - [X] Añadir categorías
 - [X] Añadir balance
 - [X] Paginación de transacciones: Implementa paginación para la lista de transacciones, especialmente si el usuario tiene muchas entradas. Esto mejorará el rendimiento y la usabilidad en dispositivos móviles.
-- [ ] Añadir iconos
+- [X] Añadir iconos
 - [ ] Añadir gráficos de ingresos y gastos
 - [ ] Añadir gráficos de ingresos y gastos por categorías
 - [ ] Añadir gráficos de ingresos y gastos por subcategorías

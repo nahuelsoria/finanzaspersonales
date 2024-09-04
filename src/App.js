@@ -271,7 +271,7 @@ const FinanzasApp = () => {
     <div className={`min-h-screen ${isDarkMode ? "dark" : ""}`}>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <motion.div
-          className="max-w-4xl mx-auto p-4"
+          className="max-w-7xl mx-auto p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
@@ -384,8 +384,8 @@ const FinanzasApp = () => {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="shadow-lg bg-white dark:bg-gray-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <Card className="shadow-lg bg-white dark:bg-gray-800 flex flex-col h-full">
               <CardHeader>
                 <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
                   <DollarSign className="mr-2 h-6 w-6 text-blue-500" />
