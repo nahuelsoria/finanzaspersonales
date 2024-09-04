@@ -64,7 +64,29 @@ E-mail:jorgenahuelsoria@gmail.com
 
 - [X] Modo oscuro
 - [X] Añadir categorías
+- [X] Añadir balance
+- [X] Paginación de transacciones: Implementa paginación para la lista de transacciones, especialmente si el usuario tiene muchas entradas. Esto mejorará el rendimiento y la usabilidad en dispositivos móviles.
 - [ ] Añadir iconos
 - [ ] Añadir gráficos de ingresos y gastos
 - [ ] Añadir gráficos de ingresos y gastos por categorías
 - [ ] Añadir gráficos de ingresos y gastos por subcategorías
+- [ ] Filtros y búsqueda: Agrega la capacidad de filtrar transacciones por fecha, categoría o tipo (ingreso/gasto). Implementa una función de búsqueda para encontrar transacciones específicas.
+- [ ] Exportar datos: Permite a los usuarios exportar sus datos a un archivo CSV o PDF para su uso en herramientas externas o para su almacenamiento en la nube.
+- [ ] Añadir alertas: Permite a los usuarios añadir alertas para sus gastos e ingresos, para que sepan cuando han gastado una cantidad de dinero o han ganado una cantidad de dinero.
+- [ ] Añadir meta de ahorro: Permite a los usuarios añadir metas de ahorro para sus gastos e ingresos, para que sepan cuando han ahorrado una cantidad de dinero o han ganado una cantidad de dinero.
+- [ ] Añadir presupuesto: Permite a los usuarios añadir presupuestos para sus gastos e ingresos, para que sepan cuando han gastado una cantidad de dinero o han ganado una cantidad de dinero.
+- [ ] Añadir proyecciones de gastos e ingresos: Permite a los usuarios añadir proyecciones de gastos e ingresos, para que sepan cuando van a gastar una cantidad de dinero o van a ganar una cantidad de dinero.
+- [ ] Añadir recomendaciones de ahorro e inversión: Permite a los usuarios añadir recomendaciones de ahorro e inversión, para que sepan cuando van a ahorrar una cantidad de dinero o van a invertir una cantidad de dinero.
+- [ ] Añadir consejos de ahorro e inversión: Permite a los usuarios añadir consejos de ahorro e inversión, para que sepan cuando van a ahorrar una cantidad de dinero o van a invertir una cantidad de dinero.
+- [ ] Mejoras en la autenticación: Implementa autenticación con redes sociales.
+- [ ] Mejoras en la interfaz de usuario: Implementa una interfaz de usuario más intuitiva y amigable.
+- [ ] Mejoras en la usabilidad: Implementa una usabilidad más sencilla y eficiente.
+- [ ] Mejoras en la seguridad: Implementa una seguridad más robusta.
+- [ ] Mejoras en la performance: Implementa una performance más eficiente.
+- [ ] Mejoras en la accesibilidad: Implementa una accesibilidad más sencilla.
+- [ ] Temas personalizables: Permite a los usuarios personalizar los colores o elegir entre varios temas predefinidos.
+- [ ] Modo offline: Implementa funcionalidad offline utilizando Service Workers y almacenamiento local.
+- [ ] Internacionalización (i18n): Agrega soporte para múltiples idiomas. Implementa formatos de moneda y fecha locales.
+- [ ] Progressive Web App (PWA): Convierte la aplicación en una PWA para permitir la instalación en dispositivos móviles.
+- [ ] Optimización de SEO: Mejora el SEO para la página de inicio pública de tu aplicación.
+- [ ] Accesibilidad: Asegúrate de que la aplicación sea accesible, siguiendo las pautas WCAG.
