@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { Plus, Minus, CreditCard, DollarSign } from "lucide-react";
+import {
+  Plus,
+  Minus,
+  DollarSign,
+  CreditCard,
+  ShoppingCart,
+  Car,
+  Home,
+  Film,
+  Heart,
+  GraduationCap,
+  ShoppingBag,
+  Briefcase,
+  MoreHorizontal,
+  MoreVertical,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button.jsx";
 import { Input } from "./components/ui/input.jsx";
@@ -24,6 +39,13 @@ import ThemeToggle from "./components/ui/ThemeToggle.jsx";
 import Select from "./components/ui/Select.jsx";
 import BalanceCard from "./components/ui/BalanceCard.jsx";
 import Pagination from "./components/ui/Pagination.jsx";
+import QuickSummary from "./components/ui/QuickSummary.jsx";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./components/ui/DropdownMenu.jsx";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
@@ -39,6 +61,42 @@ const CATEGORIES = [
   "Otros",
 ];
 
+const CATEGORY_ICONS = {
+  Alimentación: ShoppingCart,
+  Transporte: Car,
+  Vivienda: Home,
+  Entretenimiento: Film,
+  Salud: Heart,
+  Educación: GraduationCap,
+  Ropa: ShoppingBag,
+  Ingresos: Briefcase,
+  Otros: MoreHorizontal,
+};
+
+const CategoryBadge = ({ category }) => {
+  const categoryColors = {
+    Alimentación: "bg-red-100 text-red-800",
+    Transporte: "bg-blue-100 text-blue-800",
+    Vivienda: "bg-green-100 text-green-800",
+    Entretenimiento: "bg-purple-100 text-purple-800",
+    Salud: "bg-pink-100 text-pink-800",
+    Educación: "bg-yellow-100 text-yellow-800",
+    Ropa: "bg-indigo-100 text-indigo-800",
+    Ingresos: "bg-teal-100 text-teal-800",
+    Otros: "bg-gray-100 text-gray-800",
+  };
+
+  return (
+    <span
+      className={`px-2 py-1 rounded-full text-xs font-medium ${
+        categoryColors[category] || categoryColors["Otros"]
+      }`}
+    >
+      {category}
+    </span>
+  );
+};
+
 const FinanzasApp = () => {
   const [transactions, setTransactions] = useState([]);
   const [description, setDescription] = useState("");
@@ -49,6 +107,7 @@ const FinanzasApp = () => {
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const [transactionsPerPage] = useState(10);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
   const { isDarkMode } = useContext(ThemeContext);
 
@@ -188,6 +247,18 @@ const FinanzasApp = () => {
     })
   );
 
+  const totalIncome = transactions.reduce(
+    (sum, transaction) =>
+      transaction.amount > 0 ? sum + transaction.amount : sum,
+    0
+  );
+
+  const totalExpenses = transactions.reduce(
+    (sum, transaction) =>
+      transaction.amount < 0 ? sum + Math.abs(transaction.amount) : sum,
+    0
+  );
+
   if (!user) {
     return <Auth />;
   }
@@ -202,13 +273,16 @@ const FinanzasApp = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold">
-              Gestión de Finanzas Personales
-            </h1>
+          <h1 className="text-3xl font-bold">Gestión de Finanzas Personales</h1>
+
             <ThemeToggle />
           </div>
 
           <BalanceCard balance={balance} />
+          <QuickSummary
+            totalIncome={totalIncome}
+            totalExpenses={totalExpenses}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <Card className="shadow-lg bg-white dark:bg-gray-800">
@@ -224,7 +298,7 @@ const FinanzasApp = () => {
                 <div className="space-y-4">
                   <Label
                     htmlFor="description"
-                    className="text-gray-700 dark:text-gray-300"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     Descripción
                   </Label>
@@ -233,7 +307,7 @@ const FinanzasApp = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Ej: Comida, Salario, etc."
-                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
                   />
                   <Label
                     htmlFor="amount"
@@ -265,7 +339,7 @@ const FinanzasApp = () => {
                   <div className="flex space-x-2">
                     <Button
                       onClick={() => addOrUpdateTransaction("ingreso")}
-                      className="flex-1 bg-green-500 hover:bg-green-600"
+                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
                     >
                       <Plus className="mr-2 h-4 w-4" />{" "}
                       {editingTransaction ? "Actualizar" : "Ingreso"}
@@ -292,68 +366,78 @@ const FinanzasApp = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="shadow-lg bg-white dark:bg-gray-800">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
-                  <DollarSign className="mr-2 h-6 w-6" />
-                  Últimas Transacciones
-                </CardTitle>
-              </CardHeader>
+            <Card className="shadow-lg bg-white dark:bg-gray-800 transition-all duration-300 hover:shadow-xl">
+            <CardHeader>
+  <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
+    <DollarSign className="mr-2 h-6 w-6 text-blue-500" aria-hidden="true" />
+    <h3 className="text-xl font-semibold">Últimas Transacciones</h3>
+  </CardTitle>
+</CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {currentTransactions.map((transaction) => (
-                    <motion.li
-                      key={transaction.id}
-                      className="flex justify-between items-center p-2 bg-white dark:bg-gray-700 rounded-md shadow-sm"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="flex-grow mr-2">
-                          <span className="text-gray-800 dark:text-white break-words">
+                  {currentTransactions.map((transaction) => {
+                    const CategoryIcon =
+                      CATEGORY_ICONS[transaction.category] || MoreHorizontal;
+                    return (
+                      <motion.li
+                        key={transaction.id}
+                        className="flex flex-col p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm mb-2"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="flex items-center mb-2">
+                          <CategoryIcon className="mr-2 h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                          <span className="text-gray-800 dark:text-white font-medium">
                             {transaction.description}
                           </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400 block">
-                            ({transaction.category})
-                          </span>
                         </div>
-                        <span
-                          className={`whitespace-nowrap ${
-                            transaction.amount > 0
-                              ? "text-green-500"
-                              : "text-red-500"
-                          }`}
-                        >
-                          {transaction.amount.toFixed(2)} $
-                        </span>
-                      </div>
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          onClick={() => handleEdit(transaction)}
-                          className="bg-blue-500 text-white py-1 px-2 rounded-md shadow-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          onClick={() => deleteTransaction(transaction.id)}
-                          variant="destructive"
-                          className="bg-red-500 text-white py-1 px-2 rounded-md shadow-md hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
-                        >
-                          Eliminar
-                        </Button>
-                      </div>
+                        <div className="flex justify-between items-center w-full">
+                          <span
+                            className={`${
+                              transaction.amount > 0
+                                ? "text-green-500"
+                                : "text-red-500"
+                            } font-bold`}
+                          >
+                            {transaction.amount.toFixed(2)} $
+                          </span>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button className="p-1 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={() => handleEdit(transaction)}
+                                className="text-blue-500 bg-blue-50 hover:bg-blue-100 dark:text-blue-300 dark:bg-blue-900 dark:hover:bg-blue-800"
+                              >
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  deleteTransaction(transaction.id)
+                                }
+                                className="text-red-500 bg-red-50 hover:bg-red-100 dark:text-red-300 dark:bg-red-900 dark:hover:bg-red-800"
+                              >
+                                Eliminar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </motion.li>
-      ))}
-    </ul>
-    <Pagination
-      transactionsPerPage={transactionsPerPage}
-      totalTransactions={transactions.length}
-      paginate={paginate}
-      currentPage={currentPage}
-    />
-  </CardContent>
-</Card>
+                    );
+                  })}
+                </ul>
+                <Pagination
+                  transactionsPerPage={transactionsPerPage}
+                  totalTransactions={transactions.length}
+                  paginate={paginate}
+                  currentPage={currentPage}
+                />
+              </CardContent>
+            </Card>
 
             <Card className="shadow-lg bg-white dark:bg-gray-800">
               <CardHeader>
