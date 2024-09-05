@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import {
   Plus,
   Minus,
@@ -47,8 +46,7 @@ import {
   DropdownMenuTrigger,
 } from "./components/ui/DropdownMenu.jsx";
 import QuickFilters from "./components/ui/QuickFilters.jsx";
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+import { formatNumber } from "./lib/utils.js";
 
 const CATEGORIES = [
   "Alimentación",
@@ -160,7 +158,7 @@ const FinanzasApp = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
       if (user) {
-        console.log("Usuario autenticado:", user.uid); // Verificar que el usuario esté autenticado
+        //console.log("Usuario autenticado:", user.uid); // Verificar que el usuario esté autenticado
         const q = query(
           collection(db, "transactions"),
           where("userId", "==", user.uid)
@@ -180,10 +178,10 @@ const FinanzasApp = () => {
   }, []);
 
   useEffect(() => {
-    const newBalance = transactions.reduce(
-      (acc, transaction) => acc + transaction.amount,
-      0
-    );
+    const newBalance = transactions.reduce((acc, transaction) => {
+      const amount = parseFloat(transaction.amount);
+      return isNaN(amount) ? acc : acc + amount;
+    }, 0);
     setBalance(newBalance);
   }, [transactions]);
 
@@ -241,49 +239,15 @@ const FinanzasApp = () => {
     setCategory(CATEGORIES[0]);
   };
 
-  const groupedExpenses = transactions.reduce((acc, transaction) => {
-    if (transaction.amount < 0) {
-      acc[transaction.category] =
-        (acc[transaction.category] || 0) + Math.abs(transaction.amount);
-    }
-    return acc;
-  }, {});
-
-  const groupedIncomes = transactions.reduce((acc, transaction) => {
-    if (transaction.amount > 0) {
-      acc[transaction.category] =
-        (acc[transaction.category] || 0) + transaction.amount;
-    }
-    return acc;
-  }, {});
-
-  const pieDataExpenses = Object.entries(groupedExpenses).map(
-    ([name, value], index) => ({
-      name,
-      value,
-      color: COLORS[index % COLORS.length],
-    })
-  );
-
-  const pieDataIncomes = Object.entries(groupedIncomes).map(
-    ([name, value], index) => ({
-      name,
-      value,
-      color: COLORS[index % COLORS.length],
-    })
-  );
-
   const totalIncome = transactions.reduce(
-    (sum, transaction) =>
-      transaction.amount > 0 ? sum + transaction.amount : sum,
-    0
-  );
+  (sum, transaction) => transaction.amount > 0 ? sum + transaction.amount : sum,
+  0
+);
 
-  const totalExpenses = transactions.reduce(
-    (sum, transaction) =>
-      transaction.amount < 0 ? sum + Math.abs(transaction.amount) : sum,
-    0
-  );
+const totalExpenses = transactions.reduce(
+  (sum, transaction) => transaction.amount < 0 ? sum + Math.abs(transaction.amount) : sum,
+  0
+);
 
   if (!user) {
     return <Auth />;
@@ -308,8 +272,8 @@ const FinanzasApp = () => {
 
           <BalanceCard balance={balance} />
           <QuickSummary
-            totalIncome={totalIncome}
-            totalExpenses={totalExpenses}
+            totalIncome={formatNumber(totalIncome)}
+            totalExpenses={formatNumber(totalExpenses)}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -432,7 +396,7 @@ const FinanzasApp = () => {
                                 : "text-red-500"
                             } font-bold`}
                           >
-                            {transaction.amount.toFixed(2)} $
+                            {formatNumber(transaction.amount)} $
                           </span>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -468,64 +432,6 @@ const FinanzasApp = () => {
                   paginate={paginate}
                   currentPage={currentPage}
                 />
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-lg bg-white dark:bg-gray-800">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white">
-                  Distribución de Gastos
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={pieDataExpenses}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {pieDataExpenses.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-lg bg-white dark:bg-gray-800">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white">
-                  Distribución de Ingresos
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={pieDataIncomes}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#82ca9d"
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {pieDataIncomes.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>

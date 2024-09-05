@@ -1,27 +1,24 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "./card.jsx";
-import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
+import { Card, CardContent } from "./card";
+import { DollarSign } from "lucide-react";
+import { formatNumber } from "../../lib/utils";
 
 const BalanceCard = ({ balance }) => {
   const isPositive = balance >= 0;
+  const backgroundColor = isPositive ? "bg-green-100 dark:bg-green-900" : "bg-red-100 dark:bg-red-900";
+  const textColor = isPositive ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300";
+  
   return (
-    <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6 overflow-hidden">
-      <CardHeader className={`${isPositive ? 'bg-green-500' : 'bg-red-500'} text-white`}>
-      <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
-  <DollarSign className="mr-2 h-6 w-6 text-blue-500" aria-hidden="true" />
-  <span>Balance Actual</span>
-</CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <div className="flex items-center justify-center">
-          <span className={`text-4xl font-bold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-            ${Math.abs(balance).toFixed(2)}
-          </span>
-          {isPositive ? (
-            <TrendingUp className="ml-2 h-6 w-6 text-green-500" />
-          ) : (
-            <TrendingDown className="ml-2 h-6 w-6 text-red-500" />
-          )}
+    <Card className={`${backgroundColor} shadow-lg mb-6 transition-all duration-300 hover:shadow-xl`}>
+      <CardContent className="flex items-center justify-between p-6">
+        <div>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Balance Actual</p>
+          <p className={`text-4xl font-bold ${textColor}`}>
+            {isPositive ? "+" : "-"}${formatNumber(Math.abs(balance))}
+          </p>
+        </div>
+        <div className={`${textColor} bg-white dark:bg-gray-800 p-3 rounded-full`}>
+          <DollarSign className="h-12 w-12" />
         </div>
       </CardContent>
     </Card>
