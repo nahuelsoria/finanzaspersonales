@@ -15,11 +15,11 @@ import {
   Briefcase,
   MoreHorizontal,
   MoreVertical,
+  Download,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button.jsx";
 import { Input } from "./components/ui/input.jsx";
-import { Label } from "./components/ui/label.jsx";
 import { auth, db } from "./firebase";
 import {
   collection,
@@ -46,6 +46,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./components/ui/DropdownMenu.jsx";
+import QuickFilters from "./components/ui/QuickFilters.jsx";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
@@ -73,30 +74,6 @@ const CATEGORY_ICONS = {
   Otros: MoreHorizontal,
 };
 
-const CategoryBadge = ({ category }) => {
-  const categoryColors = {
-    Alimentación: "bg-red-100 text-red-800",
-    Transporte: "bg-blue-100 text-blue-800",
-    Vivienda: "bg-green-100 text-green-800",
-    Entretenimiento: "bg-purple-100 text-purple-800",
-    Salud: "bg-pink-100 text-pink-800",
-    Educación: "bg-yellow-100 text-yellow-800",
-    Ropa: "bg-indigo-100 text-indigo-800",
-    Ingresos: "bg-teal-100 text-teal-800",
-    Otros: "bg-gray-100 text-gray-800",
-  };
-
-  return (
-    <span
-      className={`px-2 py-1 rounded-full text-xs font-medium ${
-        categoryColors[category] || categoryColors["Otros"]
-      }`}
-    >
-      {category}
-    </span>
-  );
-};
-
 const FinanzasApp = () => {
   const [transactions, setTransactions] = useState([]);
   const [description, setDescription] = useState("");
@@ -108,6 +85,7 @@ const FinanzasApp = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [transactionsPerPage] = useState(10);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [currentFilter, setCurrentFilter] = useState("all");
 
   const { isDarkMode } = useContext(ThemeContext);
 
@@ -117,10 +95,66 @@ const FinanzasApp = () => {
   const sortedTransactions = transactions.sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
-  const currentTransactions = sortedTransactions.slice(
+
+  const filterTransactions = (transactions) => {
+    const today = new Date();
+    const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+
+    switch (currentFilter) {
+      case "income":
+        return transactions.filter((t) => t.amount > 0);
+      case "expense":
+        return transactions.filter((t) => t.amount < 0);
+      case "thisMonth":
+        return transactions.filter((t) => new Date(t.date) >= thisMonth);
+      case "lastMonth":
+        return transactions.filter(
+          (t) => new Date(t.date) >= lastMonth && new Date(t.date) < thisMonth
+        );
+      default:
+        return transactions;
+    }
+  };
+
+  const filteredTransactions = filterTransactions(sortedTransactions);
+  const currentTransactions = filteredTransactions.slice(
     indexOfFirstTransaction,
     indexOfLastTransaction
   );
+
+  const generateCSV = (transactions) => {
+    const headers = ["Fecha", "Descripción", "Categoría", "Monto", "Tipo"];
+    const csvContent = [
+      headers.join(","),
+      ...transactions.map((t) =>
+        [
+          new Date(t.date).toLocaleDateString(),
+          t.description.replace(/,/g, ";"),
+          t.category,
+          t.amount.toFixed(2),
+          t.amount > 0 ? "Ingreso" : "Gasto",
+        ].join(",")
+      ),
+    ].join("\n");
+
+    return csvContent;
+  };
+
+  const downloadCSV = (transactions) => {
+    const csvContent = generateCSV(transactions);
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "transacciones_finanzas_personales.csv");
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -207,18 +241,6 @@ const FinanzasApp = () => {
     setCategory(CATEGORIES[0]);
   };
 
-  // ... y en el JSX, justo después de los botones de Ingreso/Gasto:
-  {
-    editingTransaction && (
-      <Button
-        onClick={cancelEdit}
-        className="mt-2 w-full bg-gray-500 hover:bg-gray-600"
-      >
-        Cancelar Edición
-      </Button>
-    );
-  }
-
   const groupedExpenses = transactions.reduce((acc, transaction) => {
     if (transaction.amount < 0) {
       acc[transaction.category] =
@@ -301,62 +323,41 @@ const FinanzasApp = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <Label
-                    htmlFor="description"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Descripción
-                  </Label>
-                  <Input
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Ej: Comida, Salario, etc."
-                    className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-100 focus:border-indigo-300 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:border-gray-600 dark:focus:ring-gray-900 dark:focus:border-gray-500"
-                  />
-                  <Label
-                    htmlFor="amount"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Monto
-                  </Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="0.00"
-                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  <Label
-                    htmlFor="date"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Fecha
-                  </Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  <Label
-                    htmlFor="category"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Categoría
-                  </Label>
-                  <Select
-                    id="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    options={CATEGORIES}
-                    placeholder="Selecciona una categoría"
-                  />
+                <form className="space-y-4">
+                  <div className="flex space-x-2">
+                    <Input
+                      type="text"
+                      placeholder="Descripción"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="flex-grow"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Monto"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-1/3"
+                    />
+                  </div>
+                  <div className="flex space-x-2">
+                    <Select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      options={CATEGORIES}
+                      placeholder="Categoría"
+                      className="flex-grow"
+                    />
+                    <Input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-1/3"
+                    />
+                  </div>
                   <div className="flex space-x-2">
                     <Button
+                      type="button"
                       onClick={() => addOrUpdateTransaction("ingreso")}
                       className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
                     >
@@ -364,22 +365,23 @@ const FinanzasApp = () => {
                       {editingTransaction ? "Actualizar" : "Ingreso"}
                     </Button>
                     <Button
+                      type="button"
                       onClick={() => addOrUpdateTransaction("gasto")}
-                      className="flex-1 bg-red-500 hover:bg-red-600"
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105"
                     >
                       <Minus className="mr-2 h-4 w-4" />{" "}
                       {editingTransaction ? "Actualizar" : "Gasto"}
                     </Button>
-                    {editingTransaction && (
-                      <Button
-                        onClick={cancelEdit}
-                        className="flex-1 bg-gray-300 hover:bg-gray-400"
-                      >
-                        Cancelar Edición
-                      </Button>
-                    )}
                   </div>
-                </div>
+                </form>
+                {editingTransaction && (
+                  <Button
+                    onClick={cancelEdit}
+                    className="mt-2 w-full bg-gray-500 hover:bg-gray-600"
+                  >
+                    Cancelar Edición
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -391,8 +393,16 @@ const FinanzasApp = () => {
                   <DollarSign className="mr-2 h-6 w-6 text-blue-500" />
                   Últimas Transacciones
                 </CardTitle>
+                <Button
+                  onClick={() => downloadCSV(transactions)}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Exportar a CSV
+                </Button>
               </CardHeader>
               <CardContent>
+                <QuickFilters setFilter={setCurrentFilter} />
                 <ul className="space-y-2">
                   {currentTransactions.map((transaction) => {
                     const CategoryIcon =
@@ -454,7 +464,7 @@ const FinanzasApp = () => {
                 </ul>
                 <Pagination
                   transactionsPerPage={transactionsPerPage}
-                  totalTransactions={transactions.length}
+                  totalTransactions={filteredTransactions.length}
                   paginate={paginate}
                   currentPage={currentPage}
                 />
