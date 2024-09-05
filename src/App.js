@@ -47,6 +47,9 @@ import {
 } from "./components/ui/DropdownMenu.jsx";
 import QuickFilters from "./components/ui/QuickFilters.jsx";
 import { formatNumber } from "./lib/utils.js";
+import IncomeExpenseChart from './components/ui/IncomeExpenseChart.jsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/Tabs.jsx";
+import CategoriasPieChart from './components/ui/CategoriasPieChart.jsx';
 
 const CATEGORIES = [
   "Alimentación",
@@ -432,6 +435,28 @@ const totalExpenses = transactions.reduce(
                   paginate={paginate}
                   currentPage={currentPage}
                 />
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white">
+                  Gráficos Financieros
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="barras" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="barras">Ingresos y Gastos</TabsTrigger>
+                    <TabsTrigger value="torta">Categorías</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="barras">
+                    <IncomeExpenseChart transactions={transactions} />
+                  </TabsContent>
+                  <TabsContent value="torta">
+                    <CategoriasPieChart transactions={transactions} />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>

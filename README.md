@@ -1,15 +1,19 @@
 # Aplicación de Gestión de Finanzas Personales
 
 ## Descripción
-Esta aplicación web de gestión de finanzas personales permite a los usuarios llevar un registro detallado de sus ingresos y gastos. Ofrece una interfaz intuitiva para añadir, editar y eliminar transacciones, así como visualizar resúmenes y gráficos de la situación financiera personal.
+Esta aplicación web de gestión de finanzas personales permite a los usuarios llevar un registro detallado de sus ingresos y gastos. Ofrece una interfaz intuitiva y moderna para añadir, editar y eliminar transacciones, así como visualizar resúmenes y gráficos interactivos de la situación financiera personal en tiempo real.
 
 ## Características principales
-- Registro de ingresos y gastos
-- Categorización de transacciones
-- Visualización de balance actual
-- Gráficos de distribución de gastos e ingresos
-- Modo oscuro para mejor visibilidad en diferentes condiciones de luz
-- Interfaz responsiva adaptable a diferentes dispositivos
+- Registro de ingresos y gastos con categorización automática
+- Categorización personalizable de transacciones
+- Visualización de balance actual y proyecciones futuras
+- Gráficos interactivos de distribución de gastos e ingresos mensuales
+- Modo oscuro y claro para mejor visibilidad en diferentes condiciones de luz
+- Interfaz responsiva adaptable a dispositivos móviles, tablets y escritorio
+- Sincronización en tiempo real entre dispositivos
+- Exportación de datos en formato CSV para análisis externos
+- Notificaciones personalizables para recordatorios y alertas de gastos
+- Dashboard personalizable con widgets de resumen financiero
 
 ## Tecnologías utilizadas
 - **React**: Biblioteca de JavaScript para construir la interfaz de usuario.
@@ -18,8 +22,10 @@ Esta aplicación web de gestión de finanzas personales permite a los usuarios l
   - Autenticación para el manejo de usuarios.
 - **Tailwind CSS**: Framework de CSS para el diseño y estilos.
 - **Lucide React**: Biblioteca de iconos.
-- **Recharts**: Biblioteca para crear gráficos interactivos.
-- **Framer Motion**: Biblioteca para animaciones en React.
+- **Chart.js** y **react-chartjs-2**: Bibliotecas para crear gráficos interactivos.
+- **React Router**: Para la navegación entre páginas.
+- **React Hook Form**: Para el manejo de formularios.
+- **date-fns**: Para el manejo y formateo de fechas.
 
 ## Instalación y configuración
 1. Clona el repositorio:
@@ -46,11 +52,14 @@ Esta aplicación web de gestión de finanzas personales permite a los usuarios l
 
 ## Uso
 1. Regístrate o inicia sesión en la aplicación.
-2. Utiliza el formulario para añadir nuevas transacciones, especificando descripción, monto y categoría.
+2. Utiliza el formulario para añadir nuevas transacciones, especificando descripción, monto, categoría y fecha.
 3. Visualiza tus transacciones recientes y el balance actual en la página principal.
-4. Explora los gráficos de distribución para obtener insights sobre tus patrones de gasto e ingreso.
-5. Edita o elimina transacciones según sea necesario.
-6. Utiliza el botón de cambio de tema para alternar entre modo claro y oscuro.
+4. Explora los gráficos de ingresos y gastos mensuales para obtener insights sobre tus patrones financieros.
+5. Utiliza los filtros para buscar transacciones específicas por fecha, categoría o tipo.
+6. Edita o elimina transacciones según sea necesario.
+7. Exporta tus datos financieros a un archivo CSV para su análisis externo.
+8. Utiliza el botón de cambio de tema para alternar entre modo claro y oscuro.
+9. Aprovecha la interfaz responsiva para gestionar tus finanzas desde cualquier dispositivo.
 
 ## Licencia
 Este proyecto es de libre uso y está disponible bajo la licencia MIT. Puedes utilizar, modificar y distribuir este software sin restricciones, siempre y cuando se incluya el aviso de copyright original y la declaración de permisos en todas las copias o partes sustanciales del software.
@@ -71,7 +80,7 @@ E-mail:jorgenahuelsoria@gmail.com
 - [ ] Añadir gráficos de ingresos y gastos por categorías
 - [ ] Añadir gráficos de ingresos y gastos por subcategorías
 - [X] Filtros y búsqueda: Agrega la capacidad de filtrar transacciones por fecha, categoría o tipo (ingreso/gasto). Implementa una función de búsqueda para encontrar transacciones específicas.
-- [ ] Exportar datos: Permite a los usuarios exportar sus datos a un archivo CSV o PDF para su uso en herramientas externas o para su almacenamiento en la nube.
+- [X] Exportar datos: Permite a los usuarios exportar sus datos a un archivo CSV o PDF para su uso en herramientas externas o para su almacenamiento en la nube.
 - [ ] Añadir alertas: Permite a los usuarios añadir alertas para sus gastos e ingresos, para que sepan cuando han gastado una cantidad de dinero o han ganado una cantidad de dinero.
 - [ ] Añadir meta de ahorro: Permite a los usuarios añadir metas de ahorro para sus gastos e ingresos, para que sepan cuando han ahorrado una cantidad de dinero o han ganado una cantidad de dinero.
 - [ ] Añadir presupuesto: Permite a los usuarios añadir presupuestos para sus gastos e ingresos, para que sepan cuando han gastado una cantidad de dinero o han ganado una cantidad de dinero.
