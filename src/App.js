@@ -51,6 +51,7 @@ import IncomeExpenseChart from './components/ui/IncomeExpenseChart.jsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/Tabs.jsx";
 import CategoriasPieChart from './components/ui/CategoriasPieChart.jsx';
 
+// Definición de categorías para las transacciones
 const CATEGORIES = [
   "Alimentación",
   "Transporte",
@@ -63,6 +64,7 @@ const CATEGORIES = [
   "Otros",
 ];
 
+// Mapeo de categorías a iconos
 const CATEGORY_ICONS = {
   Alimentación: ShoppingCart,
   Transporte: Car,
@@ -75,28 +77,37 @@ const CATEGORY_ICONS = {
   Otros: MoreHorizontal,
 };
 
+// Componente principal de la aplicación de finanzas
 const FinanzasApp = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [balance, setBalance] = useState(0);
-  const [user, setUser] = useState(null);
-  const [editingTransaction, setEditingTransaction] = useState(null);
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [transactionsPerPage] = useState(10);
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [currentFilter, setCurrentFilter] = useState("all");
+  // Estados para manejar las transacciones y la interfaz de usuario
+  const [transactions, setTransactions] = useState([]); // Lista de transacciones
+  const [description, setDescription] = useState(""); // Descripción de la transacción
+  const [amount, setAmount] = useState(""); // Monto de la transacción
+  const [balance, setBalance] = useState(0); // Balance total
+  const [user, setUser] = useState(null); // Usuario actual
+  const [editingTransaction, setEditingTransaction] = useState(null); // Transacción en edición
+  const [category, setCategory] = useState(CATEGORIES[0]); // Categoría seleccionada
+  const [currentPage, setCurrentPage] = useState(1); // Página actual para paginación
+  const [transactionsPerPage] = useState(10); // Número de transacciones por página
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Fecha de la transacción
+  const [currentFilter, setCurrentFilter] = useState("all"); // Filtro actual
 
+  // Obtener el modo de tema (claro/oscuro) del contexto
   const { isDarkMode } = useContext(ThemeContext);
 
+  // Función para cambiar de página
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  
+  // Cálculo de índices para la paginación
   const indexOfLastTransaction = currentPage * transactionsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
+  
+  // Ordenar transacciones por fecha (más recientes primero)
   const sortedTransactions = transactions.sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
 
+  // Función para filtrar transacciones según el filtro actual
   const filterTransactions = (transactions) => {
     const today = new Date();
     const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -118,12 +129,14 @@ const FinanzasApp = () => {
     }
   };
 
+  // Aplicar filtros y paginación a las transacciones
   const filteredTransactions = filterTransactions(sortedTransactions);
   const currentTransactions = filteredTransactions.slice(
     indexOfFirstTransaction,
     indexOfLastTransaction
   );
 
+  // Función para generar contenido CSV de las transacciones
   const generateCSV = (transactions) => {
     const headers = ["Fecha", "Descripción", "Categoría", "Monto", "Tipo"];
     const csvContent = [
@@ -142,6 +155,7 @@ const FinanzasApp = () => {
     return csvContent;
   };
 
+  // Función para descargar las transacciones como archivo CSV
   const downloadCSV = (transactions) => {
     const csvContent = generateCSV(transactions);
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -157,11 +171,11 @@ const FinanzasApp = () => {
     }
   };
 
+  // Efecto para manejar la autenticación y cargar las transacciones del usuario
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
       if (user) {
-        //console.log("Usuario autenticado:", user.uid); // Verificar que el usuario esté autenticado
         const q = query(
           collection(db, "transactions"),
           where("userId", "==", user.uid)
@@ -180,6 +194,7 @@ const FinanzasApp = () => {
     return () => unsubscribe();
   }, []);
 
+  // Efecto para calcular el balance total cuando cambian las transacciones
   useEffect(() => {
     const newBalance = transactions.reduce((acc, transaction) => {
       const amount = parseFloat(transaction.amount);
@@ -188,6 +203,7 @@ const FinanzasApp = () => {
     setBalance(newBalance);
   }, [transactions]);
 
+  // Función para manejar la edición de una transacción
   const handleEdit = (transaction) => {
     setEditingTransaction(transaction);
     setDescription(transaction.description);
@@ -196,6 +212,7 @@ const FinanzasApp = () => {
     setDate(new Date(transaction.date).toISOString().split("T")[0]);
   };
 
+  // Función para agregar o actualizar una transacción
   const addOrUpdateTransaction = async (type) => {
     if (description && amount && category && user && date) {
       const transactionData = {
@@ -226,6 +243,7 @@ const FinanzasApp = () => {
     }
   };
 
+  // Función para eliminar una transacción
   const deleteTransaction = async (id) => {
     try {
       const transactionRef = doc(db, "transactions", id);
@@ -235,6 +253,7 @@ const FinanzasApp = () => {
     }
   };
 
+  // Función para cancelar la edición de una transacción
   const cancelEdit = () => {
     setEditingTransaction(null);
     setDescription("");
@@ -242,16 +261,19 @@ const FinanzasApp = () => {
     setCategory(CATEGORIES[0]);
   };
 
+  // Cálculo del total de ingresos
   const totalIncome = transactions.reduce(
   (sum, transaction) => transaction.amount > 0 ? sum + transaction.amount : sum,
   0
 );
 
-const totalExpenses = transactions.reduce(
+  // Cálculo del total de gastos
+  const totalExpenses = transactions.reduce(
   (sum, transaction) => transaction.amount < 0 ? sum + Math.abs(transaction.amount) : sum,
   0
 );
 
+  // Si no hay usuario autenticado, mostrar componente de autenticación
   if (!user) {
     return <Auth />;
   }
