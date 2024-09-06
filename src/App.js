@@ -278,15 +278,20 @@ const FinanzasApp = () => {
     return <Auth />;
   }
 
+  // Renderizado principal de la aplicación
   return (
+    // Contenedor principal con modo oscuro condicional
     <div className={`min-h-screen ${isDarkMode ? "dark" : ""}`}>
+      {/* Contenedor de fondo con colores adaptables */}
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        {/* Contenedor principal con animación de entrada */}
         <motion.div
           className="max-w-7xl mx-auto p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
+          {/* Encabezado con título y toggle de tema */}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold">
               Gestión de Finanzas Personales
@@ -295,12 +300,14 @@ const FinanzasApp = () => {
             <ThemeToggle />
           </div>
 
+          {/* Componentes de resumen financiero */}
           <BalanceCard balance={balance} />
           <QuickSummary
             totalIncome={formatNumber(totalIncome)}
             totalExpenses={formatNumber(totalExpenses)}
           />
 
+          {/* Sección de formulario para agregar/editar transacciones */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <Card className="shadow-lg bg-white dark:bg-gray-800">
               <CardHeader>
@@ -313,6 +320,7 @@ const FinanzasApp = () => {
               </CardHeader>
               <CardContent>
                 <form className="space-y-4">
+                  {/* Campos de entrada para la transacción */}
                   <div className="flex space-x-2">
                     <Input
                       type="text"
@@ -344,6 +352,7 @@ const FinanzasApp = () => {
                       className="w-1/3"
                     />
                   </div>
+                  {/* Botones para agregar ingreso o gasto */}
                   <div className="flex space-x-2">
                     <Button
                       type="button"
@@ -363,6 +372,7 @@ const FinanzasApp = () => {
                     </Button>
                   </div>
                 </form>
+                {/* Botón para cancelar la edición */}
                 {editingTransaction && (
                   <Button
                     onClick={cancelEdit}
@@ -375,13 +385,16 @@ const FinanzasApp = () => {
             </Card>
           </div>
 
+          {/* Sección de lista de transacciones y gráficos */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Lista de transacciones */}
             <Card className="shadow-lg bg-white dark:bg-gray-800 flex flex-col h-full">
               <CardHeader>
                 <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center">
                   <DollarSign className="mr-2 h-6 w-6 text-blue-500" />
                   Últimas Transacciones
                 </CardTitle>
+                {/* Botón para exportar transacciones a CSV */}
                 <Button
                   onClick={() => downloadCSV(transactions)}
                   className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center"
@@ -391,7 +404,9 @@ const FinanzasApp = () => {
                 </Button>
               </CardHeader>
               <CardContent>
+                {/* Filtros rápidos para las transacciones */}
                 <QuickFilters setFilter={setCurrentFilter} />
+                {/* Lista de transacciones */}
                 <ul className="space-y-2">
                   {currentTransactions.map((transaction) => {
                     const CategoryIcon =
@@ -404,6 +419,7 @@ const FinanzasApp = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                       >
+                        {/* Detalles de la transacción */}
                         <div className="flex items-center space-x-3">
                           <CategoryIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                           <span className="text-gray-800 dark:text-white font-medium">
@@ -413,6 +429,7 @@ const FinanzasApp = () => {
                             {new Date(transaction.date).toLocaleDateString()}
                           </span>
                         </div>
+                        {/* Monto y opciones de la transacción */}
                         <div className="flex items-center space-x-3">
                           <span
                             className={`${
@@ -423,6 +440,7 @@ const FinanzasApp = () => {
                           >
                             {formatNumber(transaction.amount)} $
                           </span>
+                          {/* Menú desplegable para editar o eliminar */}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button className="p-1 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700">
@@ -451,6 +469,7 @@ const FinanzasApp = () => {
                     );
                   })}
                 </ul>
+                {/* Componente de paginación */}
                 <Pagination
                   transactionsPerPage={transactionsPerPage}
                   totalTransactions={filteredTransactions.length}
@@ -460,6 +479,7 @@ const FinanzasApp = () => {
               </CardContent>
             </Card>
 
+            {/* Sección de gráficos financieros */}
             <Card className="shadow-lg bg-white dark:bg-gray-800 mb-6">
               <CardHeader>
                 <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -467,6 +487,7 @@ const FinanzasApp = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Tabs para cambiar entre gráficos */}
                 <Tabs defaultValue="barras" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="barras">Ingresos y Gastos</TabsTrigger>
